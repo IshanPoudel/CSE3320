@@ -1,26 +1,3 @@
-// The MIT License (MIT)
-// 
-// Copyright (c) 2016 Trevor Bakker 
-// 
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-// 
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-// 
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 #define _GNU_SOURCE
 
 #include <stdio.h>
@@ -56,8 +33,8 @@ int main()
     // This while command will wait here until the user
     // inputs something since fgets returns NULL when there
     // is no input
-                                 
-                                                           
+
+
     // Pointer to point to the token
     // parsed by strsep
     char *argument_ptr;                                         
@@ -86,43 +63,33 @@ int main()
         token_count++;
     }
 
-    
     // Now print the tokenized input as a debug check
     // \TODO Remove this code and replace with your shell functionality
 
     int token_index  = 0;
-    printf("heu");
     for( token_index = 0; token_index < token_count; token_index ++ ) 
     {
       printf("token[%d] = %s\n", token_index, token[token_index] );  
     }
 
-   
-   
-
     //Once you get the token.
     //fork process. 
 
-    pid_t child_pid = fork();
-
-    //5.quit
-
+    //5. quit function
     char quit[] = "quit";
 
     int result = strcmp(token[0] , quit);
-   
+
     if (result == 0)
     {
-      
+
       exit(EXIT_SUCCESS);
 
     }
 
-    
-   
+    pid_t child_pid = fork();
 
-    
-    
+
 
     //Once a child_pid is run succesfully , have it store the history of the function.
 
@@ -131,89 +98,62 @@ int main()
         printf(" Created a process. %d\n" ,  getpid());
         // Store the ppid in a stack. Last in First Out. 
 
-       
+        if ((strcmp(token[0] , "cd") )==0)
+        {
         
+          printf("You changed the directory\n");
+          chdir(token[1]);
+        }
 
-
-        
-
-        // 6. if blank , all token blank , then use msh again
-
-
-        int check_null = 1;
-        for (token_index = 0; token_index<token_count;token_index++)
+        else if ((strcmp(token[0] , "listpids") )==0)
         {
 
-          if (token[token_index] !=NULL)
-          {
-            check_null = 0;
-            break;
+          printf("You are about to get the listpids\n");
+        }
+        else if ((strcmp(token[0] , "!") )==0)
+        {
+          printf("You are about to get the history\n");
 
+        }
+
+        else 
+        {
+          printf("I am in the actual function\n");
+
+          // #Add the token to the command line arg
+          char * argument_list[] = {NULL , NULL , NULL} ;
+
+          for( int token_index = 0; token_index < token_count; token_index ++ ) 
+          {
+            argument_list[token_index] = token[token_index];  
           }
 
 
+          //have a queue for listpids.
+
+          //have a list for commands. 
+
+
+          // Run the argument . Store the status in execvp.
+          int status = execvp(argument_list[0] , argument_list);
+
+
+          //find a way to get the parent_ppid after execvp has been called. 
+          //  Before you call ececvp , store it in a struct//linked list.
+
+          if (status == -1)
+          {
+              //if command failed.
+              //remove the process id
+              //
+              printf("%s : Command not found\n" , command_string );
+
+          }
+
         }
-
-        if (check_null==1)
-        {
-          exit(EXIT_SUCCESS);
-        }
-
-       
-         // #Add the token to the command line arg
-        char * argument_list[] = {NULL , NULL , NULL} ;
-
-        for( token_index = 0; token_index < token_count; token_index ++ ) 
-        {
-           argument_list[token_index] = token[token_index];  
-        }
-
-
-        // result = strcmp(token[0] , "cd");
-
-        // if (result == 0)
-        // {
-        //   printf("You pressed cd");
-        //   chdir(token[1]);
-          
-          
-        // }
-
-
-        //if token == 'cd" chdir()
-
-        
-        //have a queue for listpids.
-
-        //have a list for commands. 
-
-
-
-
-
-
-
-
-       
-
         
 
-
-        // Run the argument . Store the status in execvp.
-        int status = execvp(argument_list[0] , argument_list);
         
-
-        //find a way to get the parent_ppid after execvp has been called. 
-        //  Before you call ececvp , store it in a struct//linked list.
-
-        if (status == -1)
-        {
-            //if command failed.
-            //remove the process id
-            //
-            printf("%s : Command not found\n" , command_string );
-
-        }
     }
     else
     {
