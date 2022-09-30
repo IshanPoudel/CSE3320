@@ -33,6 +33,11 @@ int main(void)
     waitpid(pid , &status , 0);
 
     // #See if the  child was terminated by a signal.
+
+    // What is WIFSIGNaled AND wtermsig
+
+    // WIFSIGNALED IS TRUE WHEN A CHILD PROCESS RAISES A SIGNAL THAT CAUSED IT TO EXIT. 
+    //  wtermsig IS USED TO SEE WHICH SIGNAL CAUSED THE CHILD TO EXIT.
     if (WIFSIGNALED(status))
     {
         printf( "Child returned with status %d\n" , WTERMSIG(status) );

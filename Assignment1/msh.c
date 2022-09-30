@@ -86,19 +86,41 @@ int main()
         token_count++;
     }
 
+    
     // Now print the tokenized input as a debug check
     // \TODO Remove this code and replace with your shell functionality
 
     int token_index  = 0;
+    printf("heu");
     for( token_index = 0; token_index < token_count; token_index ++ ) 
     {
       printf("token[%d] = %s\n", token_index, token[token_index] );  
     }
 
+   
+   
+
     //Once you get the token.
     //fork process. 
 
     pid_t child_pid = fork();
+
+    //5.quit
+
+    char quit[] = "quit";
+
+    int result = strcmp(token[0] , quit);
+   
+    if (result == 0)
+    {
+      
+      exit(EXIT_SUCCESS);
+
+    }
+
+    
+   
+
     
     
 
@@ -109,7 +131,36 @@ int main()
         printf(" Created a process. %d\n" ,  getpid());
         // Store the ppid in a stack. Last in First Out. 
 
-        // #Add the token to the command line arg
+       
+        
+
+
+        
+
+        // 6. if blank , all token blank , then use msh again
+
+
+        int check_null = 1;
+        for (token_index = 0; token_index<token_count;token_index++)
+        {
+
+          if (token[token_index] !=NULL)
+          {
+            check_null = 0;
+            break;
+
+          }
+
+
+        }
+
+        if (check_null==1)
+        {
+          exit(EXIT_SUCCESS);
+        }
+
+       
+         // #Add the token to the command line arg
         char * argument_list[] = {NULL , NULL , NULL} ;
 
         for( token_index = 0; token_index < token_count; token_index ++ ) 
@@ -118,15 +169,20 @@ int main()
         }
 
 
-        //5.quit
+        // result = strcmp(token[0] , "cd");
 
-        // 6. if blank , all token blank , then use msh again
-
-        //7.
+        // if (result == 0)
+        // {
+        //   printf("You pressed cd");
+        //   chdir(token[1]);
+          
+          
+        // }
 
 
         //if token == 'cd" chdir()
 
+        
         //have a queue for listpids.
 
         //have a list for commands. 
