@@ -21,10 +21,25 @@
 int main()
 {
 
+  
+
+  typedef struct ListofCommands
+  {
+    char command[MAX_COMMAND_SIZE];
+    struct ListofCommands *next;
+  }listofCommands;
+
+
   char * command_string = (char*) malloc( MAX_COMMAND_SIZE );
+
+ 
+  
 
   while( 1 )
   {
+    int b =0;
+    b=b+1;
+    printf("%d\n" , b);
     // Print out the msh prompt
     printf ("msh> ");
 
@@ -38,7 +53,7 @@ int main()
     // Pointer to point to the token
     // parsed by strsep
     char *argument_ptr;                                         
-                              while( !fgets (command_string, MAX_COMMAND_SIZE, stdin) );
+    while( !fgets (command_string, MAX_COMMAND_SIZE, stdin) );
 
     /* Parse input */
     char *token[MAX_NUM_ARGUMENTS];
@@ -50,6 +65,11 @@ int main()
     // keep track of its original value so we can deallocate
     // the correct amount at the end
     char *head_ptr = working_string;
+
+     if ( command_string[0] == '\n')
+     {
+     continue;
+     }
 
     // Tokenize the input strings with whitespace used as the delimiter
     while ( ( (argument_ptr = strsep(&working_string, WHITESPACE ) ) != NULL) && 
@@ -92,9 +112,14 @@ int main()
 
 
     //Once a child_pid is run succesfully , have it store the history of the function.
+    
+    int a = 0;
 
     if (child_pid == 0)
     {
+        a = a+1;
+        printf("%d" , a);
+        
         printf(" Created a process. %d\n" ,  getpid());
         // Store the ppid in a stack. Last in First Out. 
 
@@ -121,7 +146,7 @@ int main()
           printf("I am in the actual function\n");
 
           // #Add the token to the command line arg
-          char * argument_list[] = {NULL , NULL , NULL} ;
+          char * argument_list[MAX_NUM_ARGUMENTS] ; 
 
           for( int token_index = 0; token_index < token_count; token_index ++ ) 
           {
@@ -159,6 +184,7 @@ int main()
     {
         // wait for the child function to exit. 
         int status;
+        printf("%d" , a);
         waitpid(child_pid , &status , 0);
     }
 
