@@ -18,16 +18,120 @@
 #define MAX_NUM_ARGUMENTS 10     // Mav shell only supports four arguments
 
 #define MAX_HISTORY 20
+
+ struct ListofCommands
+  {
+    char *command;
+    struct ListofCommands *next;
+  };
+
+
+  struct ListofPids
+  {
+    pid_t pid;
+    struct ListofPids *next;
+
+  };
+
+  struct ListofCommands *head_command;
+  struct ListofPids *head_pids;
+
+
+  void stack_commands(char *command_to_add){
+	// printf("I am here\n");
+
+	struct ListofCommands * temp;
+	temp = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
+	
+  temp->command = command_to_add;
+	temp->next = NULL;
+
+	if (head_command == NULL)
+	{
+		head_command = temp;
+		printf("%s is added as the first entry \n", head_command->command );
+		return;
+	}
+
+	temp->next = head_command;
+	head_command= temp;
+	printf("%s is added\n" , head_command->command);
+  return;
+  }
+
+  void stack_pid(pid_t pid)
+  {
+	// printf("I am here\n");
+
+	struct ListofPids * temp;
+	temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
+	
+  temp->pid = pid;
+	temp->next = NULL;
+
+	if (head_pids== NULL)
+	{
+		head_pids = temp;
+		printf("%d is added as the first entry \n", head_pids->pid );
+		return;
+	}
+
+	temp->next = head_pids;
+	head_pids= temp;
+	printf("%d is added\n" , head_pids->pid);
+  return;
+  }
+
+  void print_command()
+  {
+    struct ListofCommands * temp;
+	  temp = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
+    printf("List of commands:");
+    while(temp!=NULL)
+
+    {
+      printf("%s ",temp->command); 
+      temp=temp->next;   
+    }
+    printf("\n");
+
+
+  }
+
+   void print_pid()
+  {
+    struct ListofPids * temp;
+	  temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
+    printf("List of pid:");
+    while(temp!=NULL)
+
+    {
+      printf("%d ",temp->pid); 
+      temp=temp->next;   
+    }
+    printf("\n");
+
+
+  }
+
+
+ 
+
+
 int main()
 {
 
   
 
-  typedef struct ListofCommands
-  {
-    char command[MAX_COMMAND_SIZE];
-    struct ListofCommands *next;
-  }listofCommands;
+
+
+  
+
+ 
+
+  
+
+
 
 
   char * command_string = (char*) malloc( MAX_COMMAND_SIZE );
@@ -37,9 +141,7 @@ int main()
 
   while( 1 )
   {
-    int b =0;
-    b=b+1;
-    printf("%d\n" , b);
+    
     // Print out the msh prompt
     printf ("msh> ");
 
@@ -121,10 +223,17 @@ int main()
         printf("%d" , a);
         
         printf(" Created a process. %d\n" ,  getpid());
+
         // Store the ppid in a stack. Last in First Out. 
+        stack_pid(getpid());
+        stack_commands(command_string);
+        print_command();
+        print_pid();
 
         if ((strcmp(token[0] , "cd") )==0)
         {
+
+          stack_commands(command_string);
         
           printf("You changed the directory\n");
           chdir(token[1]);
@@ -132,6 +241,7 @@ int main()
 
         else if ((strcmp(token[0] , "listpids") )==0)
         {
+          stack_commands(command_string);
 
           printf("You are about to get the listpids\n");
         }
@@ -158,6 +268,10 @@ int main()
 
           //have a list for commands. 
 
+          stack_commands(command_string);
+
+          
+
 
           // Run the argument . Store the status in execvp.
           int status = execvp(argument_list[0] , argument_list);
@@ -183,6 +297,7 @@ int main()
     else
     {
         // wait for the child function to exit. 
+        
         int status;
         printf("%d" , a);
         waitpid(child_pid , &status , 0);
