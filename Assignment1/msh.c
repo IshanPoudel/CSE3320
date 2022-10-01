@@ -25,7 +25,6 @@
     struct ListofCommands *next;
   };
 
-
   struct ListofPids
   {
     pid_t pid;
@@ -36,7 +35,9 @@
   struct ListofCommands *head_command;
   struct ListofPids *head_pids;
 
+//have a queue for listpids.
 
+  //have a list for commands. 
   void stack_commands(char *command_to_add){
 	// printf("I am here\n");
 
@@ -56,6 +57,8 @@
 	temp->next = head_command;
 	head_command= temp;
 	printf("%s is added\n" , head_command->command);
+
+  // #When you add a pointer the head has got to return back to the top
   return;
   }
 
@@ -84,21 +87,22 @@
 
   void print_command()
   {
-    struct ListofCommands * temp;
-	  temp = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
-    printf("List of commands:");
-    while(temp!=NULL)
 
+    struct ListofCommands *temp = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
+    temp = head_command;
+
+    while (temp!=NULL)
     {
-      printf("%s ",temp->command); 
-      temp=temp->next;   
+
+      printf("%s \n" , temp->command );
+      temp = temp->next;
+
     }
-    printf("\n");
 
 
   }
 
-   void print_pid()
+  void print_pid()
   {
     struct ListofPids * temp;
 	  temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
@@ -121,19 +125,6 @@
 int main()
 {
 
-  
-
-
-
-  
-
- 
-
-  
-
-
-
-
   char * command_string = (char*) malloc( MAX_COMMAND_SIZE );
 
  
@@ -141,7 +132,6 @@ int main()
 
   while( 1 )
   {
-    
     // Print out the msh prompt
     printf ("msh> ");
 
@@ -217,95 +207,95 @@ int main()
     
     int a = 0;
 
-    if (child_pid == 0)
+    
+        
+
+    if ((strcmp(token[0] , "cd") )==0)
     {
-        a = a+1;
-        printf("%d" , a);
-        
-        printf(" Created a process. %d\n" ,  getpid());
 
-        // Store the ppid in a stack. Last in First Out. 
-        stack_pid(getpid());
-        stack_commands(command_string);
-        print_command();
-        print_pid();
+      // stack_commands(command_string);
+    
+      printf("You changed the directory\n");
+      chdir(token[1]);
+    }
+    else if ((strcmp(token[0] , "listpids") )==0)
+    {
+      // stack_commands(command_string);
 
-        if ((strcmp(token[0] , "cd") )==0)
+      printf("You are about to get the listpids\n");
+      print_pid();
+    }
+    else if ((strcmp(token[0] , "!") )==0)
+    {
+      printf("You are about to get the history\n");
+      print_command();
+      
+
+    }
+
+    else 
+    {
+      printf("I am in the actual function\n");
+
+
+      pid_t child_pid = fork();
+
+      if (child_pid == 0)
+      {
+        // #Add the token to the command line arg
+        char * argument_list[MAX_NUM_ARGUMENTS] ; 
+
+        for( int token_index = 0; token_index < token_count; token_index ++ ) 
         {
-
-          stack_commands(command_string);
-        
-          printf("You changed the directory\n");
-          chdir(token[1]);
+          argument_list[token_index] = token[token_index];  
         }
-
-        else if ((strcmp(token[0] , "listpids") )==0)
-        {
-          stack_commands(command_string);
-
-          printf("You are about to get the listpids\n");
-        }
-        else if ((strcmp(token[0] , "!") )==0)
-        {
-          printf("You are about to get the history\n");
-
-        }
-
-        else 
-        {
-          printf("I am in the actual function\n");
-
-          // #Add the token to the command line arg
-          char * argument_list[MAX_NUM_ARGUMENTS] ; 
-
-          for( int token_index = 0; token_index < token_count; token_index ++ ) 
-          {
-            argument_list[token_index] = token[token_index];  
-          }
-
-
-          //have a queue for listpids.
-
-          //have a list for commands. 
-
-          stack_commands(command_string);
-
-          
-
 
           // Run the argument . Store the status in execvp.
-          int status = execvp(argument_list[0] , argument_list);
+        int status = execvp(argument_list[0] , argument_list);
 
 
-          //find a way to get the parent_ppid after execvp has been called. 
-          //  Before you call ececvp , store it in a struct//linked list.
+        //find a way to get the parent_ppid after execvp has been called. 
+        //  Before you call ececvp , store it in a struct//linked list.
 
-          if (status == -1)
-          {
-              //if command failed.
-              //remove the process id
-              //
-              printf("%s : Command not found\n" , command_string );
-
-          }
+        if (status == -1)
+        {
+            //if command failed.
+            //remove the process id
+            //
+            printf("%s : Command not found\n" , command_string );
 
         }
-        
 
-        
-    }
-    else
-    {
-        // wait for the child function to exit. 
+        exit(1);
+
+
+
+            
+      }
+
+      else if (child_pid==-1)
+      {
+        printf("Error creating the process");
+
+      }
+      else
+       // wait for the child function to exit. 
+      {
+        stack_commands(command_string);
+        stack_pid(child_pid);
+
+        // printf("The childs pid is %d" , child_pid);
         
         int status;
         printf("%d" , a);
         waitpid(child_pid , &status , 0);
-    }
-
-    free( head_ptr );
-
+      }
   }
+    
+  free( head_ptr );
+  }
+
+  
   return 0;
   // e2520ca2-76f3-90d6-0242ac120003
 }
