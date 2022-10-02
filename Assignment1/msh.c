@@ -142,7 +142,40 @@ void print_pid()
   }
 
 
- 
+char* getCommand(int num)
+{
+
+  printf("I am in getCommand");
+
+  int a =0;
+
+  char *cmdReturn = malloc(MAX_COMMAND_SIZE);
+
+  struct ListofCommands *temp_3 = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
+  temp_3 = head_command;
+
+  while (temp_3!=NULL)
+  {
+    printf("Current value %d , required value %d\n" , a , num);
+    if (a == num)
+    {
+      printf("%s , found it \n"  , temp_3->command);
+      strcpy(cmdReturn , temp_3->command);
+      return cmdReturn;
+      break;
+
+    }
+    a=a+1;
+
+    temp_3 = temp_3->next;
+
+  }
+
+  return "err";
+
+  
+
+}
 
 
 int main()
@@ -256,15 +289,24 @@ int main()
       printf("You are about to get the listpids\n");
       print_pid();
     }
-    else if ((strcmp(token[0] , "!") )==0)
-    {
-      printf("You are about to get the history\n");
-      // print_command(); 
-    }
     else if ((strcmp(token[0] , "history"))==0)
     {
       print_command();
+      
     }
+    else if (command_string[0] == '!')
+    {
+      printf("You are about to get the history\n");
+
+      int num = atoi(&command_string[1]);
+      // print_command(); 
+      printf("%d\n" , num);
+
+      char st[MAX_COMMAND_SIZE];
+      strcpy(st , getCommand(num));
+      printf("The function returned : %s\n" , st);
+    }
+    
 
     else 
     {
