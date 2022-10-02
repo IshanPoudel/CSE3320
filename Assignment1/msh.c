@@ -87,6 +87,7 @@ void stack_commands(char *command_to_add)
 	temp->next = head_command;
   // printf("%s is added as entry number %d\n" , temp->command , counter);
 	head_command= temp;
+  counter++;
 
 
   
@@ -116,6 +117,7 @@ void stack_pid(int pid)
 	temp->next = head_pids;
 	head_pids= temp;
 	printf("%s is added as entry number %d \n" , temp->processID , pid_counter);
+  pid_counter++;
   return;
 }
 
@@ -187,6 +189,14 @@ int main()
 
   head_command = NULL;
   head_pids = NULL;
+
+  int sendFromHistory = 0;
+
+
+  //These two are needed if we nened to tokenize from history 
+  char *storage_token[MAX_COMMAND_SIZE];
+      // Declare a counter
+  int count_tokens = 0;
 
 
 
@@ -305,12 +315,83 @@ int main()
       char st[MAX_COMMAND_SIZE];
       strcpy(st , getCommand(num));
       printf("The function returned : %s\n" , st);
+
+      // #tokenize the input
+
+      // char st has the value and we need to tokenize it and we store it in token.
+
+      char *token_2;
+      
+      token_2  = strtok(st , WHITESPACE);
+
+      // #Declaring a char array to store all the values from the tokenizer.
+      
+
+      while (token_2 != NULL)
+      {
+        
+        storage_token[count_tokens++]= strdup(token_2);
+        token_2 = strtok(NULL , WHITESPACE);
+
+      }
+
+      printf("The token that I got back from history is \n\n");
+      for( int token_index = 0; token_index < count_tokens; token_index ++ ) 
+      {
+        printf("token[%d] = %s\n", token_index, storage_token[token_index] );  
+      }
+
+      storage_token[count_tokens] = NULL;
+
+      // Need to send it over to the next line. 
+
+      // #fork a child here and stack it.
+
+
+      // int status = execvp(storage_token[0] , storage_token);
+      pid_t child_pid = fork();
+      if (child_pid == 0)
+      {
+        int status = execvp(storage_token[0] , storage_token);
+        if (status == -1)
+        {
+            //if command failed.
+            //remove the process id
+            //
+            printf("%s : Command not found\n" , command_string );
+
+        }
+
+        exit(1);
+      }
+      else
+      {
+        int status;
+       
+        waitpid(child_pid , &status , 0);
+        printf("I am about to stack from the history command\n");
+        stack_commands("stacked from histroy\n");
+      }
+
+      
+      
+
+      
+
+
+
+
+
+
+
+
     }
     
 
     else 
     {
 
+      printf("I am in the child function");
      
       
 
@@ -319,12 +400,28 @@ int main()
       if (child_pid == 0)
       {
         // #Add the token to the command line arg
+        
         char * argument_list[MAX_NUM_ARGUMENTS] ; 
 
-        for( int token_index = 0; token_index < token_count; token_index ++ ) 
+        if (sendFromHistory ==1)
         {
-          argument_list[token_index] = token[token_index];  
+          // We nned to use the tokenized output from the condition where the history part was called. 
+          for (int token_index = 0; token_index<count_tokens ; token_index++)
+          {
+            argument_list[token_index] = storage_token[token_index];
+          }
+          sendFromHistory = 0;
         }
+        else
+        {
+          for( int token_index = 0; token_index < token_count; token_index ++ ) 
+          {
+          argument_list[token_index] = token[token_index];  
+          }
+
+        }
+
+        
 
           // Run the argument . Store the status in execvp.
        
@@ -369,8 +466,7 @@ int main()
         waitpid(child_pid , &status , 0);
 
         // printf("I am in the parent function.");
-        counter++;
-        pid_counter++;
+        
         // printf("The current value of the counter is %d \n" , counter);
         printf("The current value of the pid counter is %d\n" , pid_counter);
 
