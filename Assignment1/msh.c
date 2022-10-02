@@ -45,75 +45,48 @@
 
  void print_command()
   {
-
-   
-
     struct ListofCommands *temp_2 = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
     temp_2 = head_command;
 
     int count = 0;
-    // have an array
+    // have an array to store values becuase you want to print the stack in the reverse way
     char *commandList[MAX_HISTORY];
-
-
+    
     while(temp_2!=NULL && count < MAX_HISTORY)
     {
-
-      // printf("%s\n" , temp_2->command );
-      // printf("%p\n" , temp_2 ->next);
       commandList[count++] = strdup(temp_2->command);
-      // strcpy(commandList[count++] , temp_2->command);
       temp_2 = temp_2->next; 
-      
-
     }
-
-    printf(" Value of counter is : %d  " , counter);
-
+    
+     // counter is the global count of all commands. We want to start from the last value , as that is the first value in the stack
     int local_counter = counter;
+    // if there are more than 15 elements in the stack , get only the first 15 in the stack , which will be the last 15 entered
     if (counter > 15)
     {
       local_counter = 15;
     }
 
-    //now that you have the value. 
+    //iterate through the stack 
     for (int i=local_counter-1;i>=0; i--)
     {
-    
-      
-      printf("%d : %s \n" , local_counter-i-1 , commandList[i]);
-      
+       printf("%d : %s \n" , local_counter-i-1 , commandList[i]);
     }
-
-
   }
-//have a queue for listpids.
 
-  //have a list for commands. 
 void stack_commands(char *command_to_add)
 {
-
+  //Declare a temporary node to store value
 	struct ListofCommands * temp;
 	temp = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
 
- 
-
-  // printf("Command to add is %s" , command_to_add);
-	
-  
-
-	// strcpy(temp->command , command_to_add);
-
   temp->command = strdup(command_to_add);
-
-	temp->next = head_command;
-  // printf("%s is added as entry number %d\n" , temp->command , counter);
-	head_command= temp;
-  counter++;
-
-
+  temp->next = head_command;
   
-	
+  // store the temp node as the first element
+	head_command= temp;
+
+  //Increase the global counter
+  counter++;
 }
  
 
@@ -121,24 +94,19 @@ void stack_pid(int pid)
 {
 
   char str[6];
-	// printf("I am here\n");
-
-
+	
+  // Declare a temp struct to store the pid . The pid is converted to char.
 	struct ListofPids * temp;
 	temp = (struct ListofPids*) malloc(sizeof(struct ListofPids)); 
 
   sprintf(str , "%d" , pid);
-
-  printf("PROCESS ID : %s\n" , str);
 	
   temp->processID = strdup(str);
-	temp->next = NULL;
-
-	
-
 	temp->next = head_pids;
+  // Declare the temp struct as the head.
 	head_pids= temp;
-	printf("%s is added as entry number %d \n" , temp->processID , pid_counter);
+
+	//Increase the pid counter
   pid_counter++;
   return;
 }
@@ -151,24 +119,21 @@ void print_pid()
     struct ListofPids * temp;
 	  temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
 
+    //Have an array to store the values because you wanted it printed the reverse way
     char *pidList[MAX_PIDS];
 
     temp = head_pids;
     int local_counter = 0;
-    printf("List of pid:");
+    
+    //Go through the stack and store each value in the array
     while(temp!=NULL && local_counter<MAX_PIDS)
 
     {
-      pidList[local_counter++] = temp->processID;
-      
-      temp=temp->next; 
-      
+      pidList[local_counter++] = temp->processID;  
+      temp=temp->next;   
     }
-    printf("\n");
-
-    // #print through the array list
-    printf(" Value of counter is : %d  " , pid_counter);
-
+  
+    // print through the array list
     local_counter = counter;
     if (counter > 15)
     {
@@ -178,8 +143,6 @@ void print_pid()
     //now that you have the value. 
     for (int i=local_counter-1;i>=0; i--)
     {
-    
-      
       printf("%d : %s \n" , local_counter-i-1 , pidList[i]);
     }
       
@@ -191,47 +154,32 @@ void print_pid()
 char* getCommand(int num)
 {
 
-  // #store an array
+  // Create an array to store stack value.
   char *cmdList[MAX_HISTORY];
 
-
-  printf("I am in getCommand");
-
   int a =0;
-
+  // Declare a variable , which will get the nth command.
   char *cmdReturn = malloc(MAX_COMMAND_SIZE);
 
   struct ListofCommands *temp_3 = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
   temp_3 = head_command;
-
+  //Create an array
   while (temp_3!=NULL)
   {
      cmdList[a++] = strdup(temp_3->command);
-      // strcpy(commandList[count++] , temp_2->command);
      temp_3 = temp_3->next; 
-    
-
   }
 
-  // #iterate through the array
+ 
   int local_counter = counter;
   if (counter > 15)
   {
       local_counter = 15;
   }
 
-  // #num to return 
-  
-
+  //return the value from the array list. 
+  // nth number as specified by the user would be local_counter-num-1th item in the stack
   return cmdList[local_counter-num-1];
-
-
-
-
-  
-
-  
-
 }
 
 
@@ -239,9 +187,12 @@ int main()
 {
 
   char * command_string = (char*) malloc( MAX_COMMAND_SIZE );
+
+  //Initialize command_counter and pid_counter to zero
   counter = 0;
   pid_counter = 0;
-
+  
+  //Initialize the head pointers of linkedlist to zero
   head_command = NULL;
   head_pids = NULL;
 
@@ -250,13 +201,9 @@ int main()
 
   //These two are needed if we nened to tokenize from history 
   char *storage_token[MAX_COMMAND_SIZE];
-      // Declare a counter
+  // Declare a counter
   int count_tokens = 0;
 
-
-
-
- 
   
 
   while( 1 )
@@ -307,124 +254,77 @@ int main()
     // Now print the tokenized input as a debug check
     // \TODO Remove this code and replace with your shell functionality
 
-    int token_index  = 0;
-    for( token_index = 0; token_index < token_count; token_index ++ ) 
-    {
-      printf("token[%d] = %s\n", token_index, token[token_index] );  
-    }
-
-    //Once you get the token.
-    //fork process. 
-
     //5. quit function
-    char quit[] = "quit";
-
-    int result = strcmp(token[0] , quit);
-
-    if (result == 0)
+   
+    if ((strcmp(token[0] , "quit") )==0 || (strcmp(token[0] , "exit") )==0)
     {
 
       exit(EXIT_SUCCESS);
-
     }
 
-   
-
-
-
-    //Once a child_pid is run succesfully , have it store the history of the function.
-    
   
-
-    
-        
-
     if ((strcmp(token[0] , "cd") )==0)
     {
-
-      // stack_commands(command_string);
-    
-      printf("You changed the directory\n");
+      stack_commands(command_string);
       chdir(token[1]);
     }
     else if ((strcmp(token[0] , "listpids") )==0)
     {
-      // stack_commands(command_string);
-
-      printf("You are about to get the listpids\n");
+      stack_commands(command_string);
       print_pid();
     }
     else if ((strcmp(token[0] , "history"))==0)
     {
+      stack_commands(token[0]);
       print_command();
       
     }
     else if (command_string[0] == '!')
     {
-      printf("You are about to get the history\n");
-
-      int num = atoi(&command_string[1]);
-      // print_command(); 
+      
+      // get which index we want to store
+      int num = atoi(&command_string[1]); 
       if (num > counter || num > 15)
       {
         printf("Invalid choice \n");
         continue;
       }
-      printf("%d\n" , num);
+    
 
       char st[MAX_COMMAND_SIZE];
+      //call the getCommand function to return the command at the nth position.
       strcpy(st , getCommand(num));
-      printf("The function returned : %s\n" , st);
-
+      
+      // have a copy of the command before we tokenize
       char cmd_copy[MAX_COMMAND_SIZE];
       strcpy(cmd_copy , st);
 
-      // #tokenize the input
+      //tokenize the input
 
-      // char st has the value and we need to tokenize it and we store it in token.
-
-      char *token_2;
       
+      char *token_2; 
       token_2  = strtok(st , WHITESPACE);
 
-      // #Declaring a char array to store all the values from the tokenizer.
-      
-
+      // Declaring a char array to store all the values from the tokenizer.
       while (token_2 != NULL)
       {
-        
         storage_token[count_tokens++]= strdup(token_2);
         token_2 = strtok(NULL , WHITESPACE);
-
-      }
-
-      printf("The token that I got back from history is \n\n");
-      for( int token_index = 0; token_index < count_tokens; token_index ++ ) 
-      {
-        printf("token[%d] = %s\n", token_index, storage_token[token_index] );  
       }
 
       storage_token[count_tokens] = NULL;
 
-      // Need to send it over to the next line. 
+      
 
-      // #fork a child here and stack it.
-
-
-      // int status = execvp(storage_token[0] , storage_token);
+      // fork a child here and stack it.
       pid_t child_pid = fork();
       if (child_pid == 0)
       {
         int status = execvp(storage_token[0] , storage_token);
         if (status == -1)
         {
-            //if command failed.
-            //remove the process id
-            //
             printf("%s : Command not found\n" , cmd_copy );
-
         }
-
         exit(1);
       }
       else
@@ -432,118 +332,52 @@ int main()
         int status;
        
         waitpid(child_pid , &status , 0);
-        printf("I am about to stack from the history command\n");
+        // printf("I am about to stack from the history command\n");
         stack_commands(cmd_copy);
         stack_pid(child_pid);
       }
 
-      // #clear store_token
+      //clear store_token
       count_tokens = 0;
-
-      
-      
-
-      
-
-
-
-
-
-
-
-
     }
     
-
     else 
     {
-
-      printf("I am in the child function");
-     
-      
-
+      //fork a process
       pid_t child_pid = fork();
 
       if (child_pid == 0)
       {
-        // #Add the token to the command line arg
-        
-        char * argument_list[MAX_NUM_ARGUMENTS] ; 
-
-        if (sendFromHistory ==1)
-        {
-          // We nned to use the tokenized output from the condition where the history part was called. 
-          for (int token_index = 0; token_index<count_tokens ; token_index++)
-          {
-            argument_list[token_index] = storage_token[token_index];
-          }
-          sendFromHistory = 0;
-        }
-        else
-        {
-          for( int token_index = 0; token_index < token_count; token_index ++ ) 
-          {
-          argument_list[token_index] = token[token_index];  
-          }
-
-        }
-
-        
-
-          // Run the argument . Store the status in execvp.
-       
-        // stack_pid(child_pid);
-        int status = execvp(argument_list[0] , argument_list);
-
-
-        //find a way to get the parent_ppid after execvp has been called. 
-        //  Before you call ececvp , store it in a struct//linked list.
+        // Run the argument . Store the status in execvp.
+      
+        int status = execvp(token[0] , token);
 
         if (status == -1)
         {
-            //if command failed.
-            //remove the process id
-            //
-            printf("%s : Command not found\n" , command_string );
-
+          printf("%s : Command not found\n" , command_string );
         }
 
-        exit(1);
-
-
-
-            
+        exit(1);            
       }
 
       else if (child_pid==-1)
       {
         printf("Error creating the process");
-
       }
       else
        // wait for the child function to exit. 
       {
         //in the parent function
-        
-
-        // printf("The childs pid is %d" , child_pid);
+      
 
         int status;
        
         waitpid(child_pid , &status , 0);
 
-        // printf("I am in the parent function.");
-        
-        // printf("The current value of the counter is %d \n" , counter);
-        printf("The current value of the pid counter is %d\n" , pid_counter);
+        // printf("The current value of the pid counter is %d\n" , pid_counter);
 
         stack_commands(command_string);
-        stack_pid((int)child_pid);
-        // print_command();
-        
-        
-        
-        
+        stack_pid((int)child_pid); 
       }
   }
     
