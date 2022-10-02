@@ -52,15 +52,37 @@
     temp_2 = head_command;
 
     int count = 0;
+    // have an array
+    char *commandList[MAX_HISTORY];
+
 
     while(temp_2!=NULL && count < MAX_HISTORY)
     {
 
-      printf("%s\n" , temp_2->command );
-      printf("%p\n" , temp_2 ->next);
-      temp_2 = temp_2->next;
-      count++;
+      // printf("%s\n" , temp_2->command );
+      // printf("%p\n" , temp_2 ->next);
+      commandList[count++] = strdup(temp_2->command);
+      // strcpy(commandList[count++] , temp_2->command);
+      temp_2 = temp_2->next; 
+      
 
+    }
+
+    printf(" Value of counter is : %d  " , counter);
+
+    int local_counter = counter;
+    if (counter > 15)
+    {
+      local_counter = 15;
+    }
+
+    //now that you have the value. 
+    for (int i=local_counter-1;i>=0; i--)
+    {
+    
+      
+      printf("%d : %s \n" , local_counter-i-1 , commandList[i]);
+      
     }
 
 
@@ -130,13 +152,14 @@ void print_pid()
 	  temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
 
     temp = head_pids;
+    int local_counter = pid_counter;
     printf("List of pid:");
-    while(temp!=NULL && pid_counter<MAX_PIDS)
+    while(temp!=NULL && local_counter<MAX_PIDS)
 
     {
       printf("%s ",temp->processID); 
       temp=temp->next; 
-      pid_counter++;  
+      local_counter++;  
     }
     printf("\n");
 
@@ -146,6 +169,10 @@ void print_pid()
 
 char* getCommand(int num)
 {
+
+  // #store an array
+  char *cmdList[MAX_HISTORY];
+
 
   printf("I am in getCommand");
 
@@ -158,22 +185,29 @@ char* getCommand(int num)
 
   while (temp_3!=NULL)
   {
-    printf("Current value %d , required value %d\n" , a , num);
-    if (a == num)
-    {
-      printf("%s , found it \n"  , temp_3->command);
-      strcpy(cmdReturn , temp_3->command);
-      return cmdReturn;
-      break;
-
-    }
-    a=a+1;
-
-    temp_3 = temp_3->next;
+     cmdList[a++] = strdup(temp_3->command);
+      // strcpy(commandList[count++] , temp_2->command);
+     temp_3 = temp_3->next; 
+    
 
   }
 
-  return "err";
+  // #iterate through the array
+  int local_counter = counter;
+  if (counter > 15)
+  {
+      local_counter = 15;
+  }
+
+  // #num to return 
+  
+
+  return cmdList[local_counter-num-1];
+
+
+
+
+  
 
   
 
@@ -310,11 +344,19 @@ int main()
 
       int num = atoi(&command_string[1]);
       // print_command(); 
+      if (num > counter || num > 15)
+      {
+        printf("Invalid choice \n");
+        continue;
+      }
       printf("%d\n" , num);
 
       char st[MAX_COMMAND_SIZE];
       strcpy(st , getCommand(num));
       printf("The function returned : %s\n" , st);
+
+      char cmd_copy[MAX_COMMAND_SIZE];
+      strcpy(cmd_copy , st);
 
       // #tokenize the input
 
@@ -358,7 +400,7 @@ int main()
             //if command failed.
             //remove the process id
             //
-            printf("%s : Command not found\n" , command_string );
+            printf("%s : Command not found\n" , cmd_copy );
 
         }
 
@@ -370,8 +412,12 @@ int main()
        
         waitpid(child_pid , &status , 0);
         printf("I am about to stack from the history command\n");
-        stack_commands("stacked from histroy\n");
+        stack_commands(cmd_copy);
+        stack_pid(child_pid);
       }
+
+      // #clear store_token
+      count_tokens = 0;
 
       
       
