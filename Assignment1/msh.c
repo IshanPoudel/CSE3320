@@ -18,6 +18,7 @@
 #define MAX_NUM_ARGUMENTS 10     // Mav shell only supports four arguments
 
 #define MAX_HISTORY 20
+#define MAX_PIDS 15
 
  struct ListofCommands
   {
@@ -122,16 +123,18 @@ void stack_pid(int pid)
 
 void print_pid()
   {
+    int pid_counter = 0;
     struct ListofPids * temp;
 	  temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
 
     temp = head_pids;
     printf("List of pid:");
-    while(temp!=NULL)
+    while(temp!=NULL && pid_counter<MAX_PIDS)
 
     {
       printf("%s ",temp->processID); 
-      temp=temp->next;   
+      temp=temp->next; 
+      pid_counter++;  
     }
     printf("\n");
 
