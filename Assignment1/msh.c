@@ -120,7 +120,7 @@ void stack_commands(char *command_to_add)
 void stack_pid(int pid)
 {
 
-  char str[5];
+  char str[6];
 	// printf("I am here\n");
 
 
@@ -151,17 +151,38 @@ void print_pid()
     struct ListofPids * temp;
 	  temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
 
+    char *pidList[MAX_PIDS];
+
     temp = head_pids;
-    int local_counter = pid_counter;
+    int local_counter = 0;
     printf("List of pid:");
     while(temp!=NULL && local_counter<MAX_PIDS)
 
     {
-      printf("%s ",temp->processID); 
+      pidList[local_counter++] = temp->processID;
+      
       temp=temp->next; 
-      local_counter++;  
+      
     }
     printf("\n");
+
+    // #print through the array list
+    printf(" Value of counter is : %d  " , pid_counter);
+
+    local_counter = counter;
+    if (counter > 15)
+    {
+      local_counter = 15;
+    }
+
+    //now that you have the value. 
+    for (int i=local_counter-1;i>=0; i--)
+    {
+    
+      
+      printf("%d : %s \n" , local_counter-i-1 , pidList[i]);
+    }
+      
 
 
   }
