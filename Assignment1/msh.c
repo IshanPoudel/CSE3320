@@ -27,7 +27,7 @@
 
   struct ListofPids
   {
-    pid_t pid;
+    char *processID;
     struct ListofPids *next;
 
   };
@@ -36,6 +36,7 @@
   struct ListofPids *head_pids;
 
   int counter;
+  int pid_counter;
 
  
 
@@ -49,12 +50,15 @@
     struct ListofCommands *temp_2 = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
     temp_2 = head_command;
 
-    while (temp_2!=NULL)
+    int count = 0;
+
+    while(temp_2!=NULL && count < MAX_HISTORY)
     {
 
-      printf("%s \n" , temp_2->command );
+      printf("%s\n" , temp_2->command );
       printf("%p\n" , temp_2 ->next);
       temp_2 = temp_2->next;
+      count++;
 
     }
 
@@ -71,7 +75,7 @@ void stack_commands(char *command_to_add)
 
  
 
-  printf("Command to add is %s" , command_to_add);
+  // printf("Command to add is %s" , command_to_add);
 	
   
 
@@ -80,50 +84,53 @@ void stack_commands(char *command_to_add)
   temp->command = strdup(command_to_add);
 
 	temp->next = head_command;
-  printf("%s is added as entry number %d\n" , temp->command , counter);
+  // printf("%s is added as entry number %d\n" , temp->command , counter);
 	head_command= temp;
 
 
-  printf("Current stack\n");
-  print_command();
+  
 	
 }
  
 
-  void stack_pid(pid_t pid)
-  {
+void stack_pid(int pid)
+{
+
+  char str[5];
 	// printf("I am here\n");
 
+
 	struct ListofPids * temp;
-	temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
+	temp = (struct ListofPids*) malloc(sizeof(struct ListofPids)); 
+
+  sprintf(str , "%d" , pid);
+
+  printf("PROCESS ID : %s\n" , str);
 	
-  temp->pid = pid;
+  temp->processID = strdup(str);
 	temp->next = NULL;
 
-	if (head_pids== NULL)
-	{
-		head_pids = temp;
-		printf("%d is added as the first entry \n", head_pids->pid );
-		return;
-	}
+	
 
 	temp->next = head_pids;
 	head_pids= temp;
-	printf("%d is added\n" , head_pids->pid);
+	printf("%s is added as entry number %d \n" , temp->processID , pid_counter);
   return;
-  }
+}
 
   
 
-  void print_pid()
+void print_pid()
   {
     struct ListofPids * temp;
 	  temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
+
+    temp = head_pids;
     printf("List of pid:");
     while(temp!=NULL)
 
     {
-      printf("%d ",temp->pid); 
+      printf("%s ",temp->processID); 
       temp=temp->next;   
     }
     printf("\n");
@@ -140,6 +147,7 @@ int main()
 
   char * command_string = (char*) malloc( MAX_COMMAND_SIZE );
   counter = 0;
+  pid_counter = 0;
 
   head_command = NULL;
   head_pids = NULL;
@@ -250,11 +258,15 @@ int main()
       printf("You are about to get the history\n");
       // print_command(); 
     }
+    else if ((strcmp(token[0] , "history"))==0)
+    {
+      print_command();
+    }
 
     else 
     {
 
-      printf("i AM IN THE FUNCTION");
+     
       
 
       pid_t child_pid = fork();
@@ -307,15 +319,18 @@ int main()
 
         // printf("The childs pid is %d" , child_pid);
 
-        // int status;
+        int status;
        
-        // waitpid(child_pid , &status , 0);
+        waitpid(child_pid , &status , 0);
 
-        printf("I am in the parent function.");
+        // printf("I am in the parent function.");
         counter++;
-        printf("The current value of the counter is %d \n" , counter);
+        pid_counter++;
+        // printf("The current value of the counter is %d \n" , counter);
+        printf("The current value of the pid counter is %d\n" , pid_counter);
 
         stack_commands(command_string);
+        stack_pid((int)child_pid);
         // print_command();
         
         
