@@ -8,7 +8,7 @@
 #include <string.h>
 #include <signal.h>
  
- struct ListofCommands
+struct ListofCommands
   {
     char *command;
     struct ListofCommands *next;
@@ -30,17 +30,31 @@ void stack_commands(char *command_to_add)
     if (head_command == NULL)
     {
         head_command = temp;
-        printf("%s is added as the first entry \n", head_command->command );
+        
         return;
     }
     
     temp->next = head_command;
     head_command= temp;
-    printf("%s is added\n" , head_command->command);
+
+    printf("\n\n Current Stack \n\n");
+    struct ListofCommands * temp2 = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
+    temp2= head_command;
+
+    while(temp2!=NULL)
+    {
+      printf("%s\n" , temp2->command);
+      printf("%p\n" , temp2->next);
+      temp2 = temp2->next;
+    }
+    
+    return;
+}
+   
 
   // #When you add a pointer the head has got to return back to the top
-  return;
-}
+ 
+
 
 
 void print_command()
@@ -68,14 +82,15 @@ int main()
 
     int a = 1;
 
-    
-
     stack_commands("abc");
-    stack_commands("bcd");
-    stack_commands("aef");
-
+    stack_commands("ls_b");
+    stack_commands("ls -a");
     print_command();
 
+    
+
+   
+   
     return 0;
 
 }

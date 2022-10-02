@@ -7,7 +7,7 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
-
+#include <string.h>
 #define WHITESPACE " \t\n"      // We want to split our command line up into tokens
                                 // so we need to define what delimits our tokens.
                                 // In this case  white space
@@ -19,130 +19,44 @@
 
 #define MAX_HISTORY 20
 
- struct ListofCommands
-  {
-    char *command;
-    struct ListofCommands *next;
-  };
+#define MAX_PID 20
 
-  struct ListofPids
-  {
-    pid_t pid;
-    struct ListofPids *next;
-
-  };
-
-  struct ListofCommands *head_command;
-  struct ListofPids *head_pids;
-
-  int counter;
-
+ 
+char listofcommand[MAX_HISTORY][MAX_COMMAND_SIZE];
+int command_counter = 0;
+int listofPid[MAX_PID];
+int pid_counter = 0;
  
 
 
-
- void print_command()
-  {
-
-   
-
-    struct ListofCommands *temp_2 = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
-    temp_2 = head_command;
-
-    while (temp_2!=NULL)
-    {
-
-      printf("%s \n" , temp_2->command );
-      printf("%p\n" , temp_2 ->next);
-      temp_2 = temp_2->next;
-
-    }
-
-
-  }
-//have a queue for listpids.
-
-  //have a list for commands. 
-void stack_commands(char *command_to_add)
+void print_command()
 {
 
-	struct ListofCommands * temp;
-	temp = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
+    printf("Your history is \n\n");
 
- 
-
-  printf("Command to add is %s" , command_to_add);
-	
-  
-
-	// strcpy(temp->command , command_to_add);
-
-  temp->command = strdup(command_to_add);
-
-	temp->next = head_command;
-  printf("%s is added as entry number %d\n" , temp->command , counter);
-	head_command= temp;
-
-
-  printf("Current stack\n");
-  print_command();
-	
-}
- 
-
-  void stack_pid(pid_t pid)
-  {
-	// printf("I am here\n");
-
-	struct ListofPids * temp;
-	temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
-	
-  temp->pid = pid;
-	temp->next = NULL;
-
-	if (head_pids== NULL)
-	{
-		head_pids = temp;
-		printf("%d is added as the first entry \n", head_pids->pid );
-		return;
-	}
-
-	temp->next = head_pids;
-	head_pids= temp;
-	printf("%d is added\n" , head_pids->pid);
-  return;
-  }
-
-  
-
-  void print_pid()
-  {
-    struct ListofPids * temp;
-	  temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
-    printf("List of pid:");
-    while(temp!=NULL)
-
+    for (int i=0 ; i<command_counter;i++)
     {
-      printf("%d ",temp->pid); 
-      temp=temp->next;   
+        printf("%s\n" , listofcommand[i]);
     }
-    printf("\n");
+
+}
 
 
-  }
-
-
- 
+void print_pid()
+{
+    printf("The process is is \n\n");
+    for (int i=0 ; i<pid_counter;i++)
+    {
+        printf("%d\n" , listofPid[i]);
+    }
+}
 
 
 int main()
 {
 
   char * command_string = (char*) malloc( MAX_COMMAND_SIZE );
-  counter = 0;
-
-  head_command = NULL;
-  head_pids = NULL;
+  
 
 
 
@@ -244,11 +158,13 @@ int main()
 
       printf("You are about to get the listpids\n");
       print_pid();
+     
     }
-    else if ((strcmp(token[0] , "!") )==0)
+    else if ((strcmp(token[0] , "showpids") )==0)
     {
       printf("You are about to get the history\n");
-      // print_command(); 
+      print_command();
+      
     }
 
     else 
@@ -312,12 +228,27 @@ int main()
         // waitpid(child_pid , &status , 0);
 
         printf("I am in the parent function.");
-        counter++;
-        printf("The current value of the counter is %d \n" , counter);
 
-        stack_commands(command_string);
-        // print_command();
-        
+        if (pid_counter < MAX_PID)
+        {
+            listofPid[pid_counter++] = child_pid;
+            printf("Added %d\n" , child_pid);
+            
+        }
+
+        if (command_counter<MAX_HISTORY)
+        {
+            // *listofcommand[command_counter] = *command_string;
+            // printf("Added %s \n" , listofcommand[command_counter]);
+            printf("Adding %s\n" , command_string);
+            strcpy(listofcommand[command_counter] , command_string);
+           
+            command_counter++;
+
+        }
+
+        int status;
+        waitpid(child_pid , &status , 0);
         
         
         
