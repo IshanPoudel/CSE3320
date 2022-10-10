@@ -1,3 +1,11 @@
+/*
+Name : Ishan Poudel
+ID: 1001838432
+
+*/
+
+
+
 #define _GNU_SOURCE
 
 #include <stdio.h>
@@ -17,8 +25,8 @@
 
 #define MAX_NUM_ARGUMENTS 10     // Mav shell only supports four arguments
 
-#define MAX_HISTORY 20
-#define MAX_PIDS 15
+#define MAX_HISTORY 15
+#define MAX_PIDS 20
 
  struct ListofCommands
   {
@@ -45,6 +53,15 @@
 
  void print_command()
   {
+    /*
+
+    print_command() 
+    Parameters: None
+    Goes through the ListofCommands stack data and prints the first 15 elements in the stack 
+    (which is the last 15 commands entered by the user)
+
+    */
+    
     struct ListofCommands *temp_2 = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
     temp_2 = head_command;
 
@@ -61,9 +78,9 @@
      // counter is the global count of all commands. We want to start from the last value , as that is the first value in the stack
     int local_counter = counter;
     // if there are more than 15 elements in the stack , get only the first 15 in the stack , which will be the last 15 entered
-    if (counter > 15)
+    if (counter > MAX_HISTORY)
     {
-      local_counter = 15;
+      local_counter = MAX_HISTORY;
     }
 
     //iterate through the stack 
@@ -75,6 +92,12 @@
 
 void stack_commands(char *command_to_add)
 {
+
+  /*
+  Parameter: String pointer which contains the command the user entered.
+  Adds the string to the ListofCommands data structure.
+
+  */
   //Declare a temporary node to store value
 	struct ListofCommands * temp;
 	temp = (struct ListofCommands*) malloc(sizeof(struct ListofCommands));
@@ -92,6 +115,13 @@ void stack_commands(char *command_to_add)
 
 void stack_pid(int pid)
 {
+
+  /*
+  Parameters: interer value which contains the process id of a process.
+  Stacked into the ListofPids data structure. 
+  */
+
+  
 
   char str[6];
 	
@@ -115,7 +145,12 @@ void stack_pid(int pid)
 
 void print_pid()
   {
-    int pid_counter = 0;
+
+    /*
+    prints the last 20 process's pid value.
+    */
+    
+    
     struct ListofPids * temp;
 	  temp = (struct ListofPids*) malloc(sizeof(struct ListofPids));
 
@@ -134,10 +169,10 @@ void print_pid()
     }
   
     // print through the array list
-    local_counter = counter;
-    if (counter > 15)
+    local_counter = pid_counter;
+    if (pid_counter> MAX_PIDS)
     {
-      local_counter = 15;
+      local_counter = MAX_PIDS;
     }
 
     //now that you have the value. 
@@ -153,6 +188,11 @@ void print_pid()
 
 char* getCommand(int num)
 {
+
+  /*
+  Parameter : nth command. 
+  Return the nth command entered by the user.
+  */
 
   // Create an array to store stack value.
   char *cmdList[MAX_HISTORY];
@@ -374,7 +414,7 @@ int main()
        
         waitpid(child_pid , &status , 0);
 
-        // printf("The current value of the pid counter is %d\n" , pid_counter);
+        
 
         stack_commands(command_string);
         stack_pid((int)child_pid); 
@@ -388,10 +428,3 @@ int main()
   return 0;
   // e2520ca2-76f3-90d6-0242ac120003
 }
-
-//Need to see when to store the command. 
-// in the parent class. 
-// can't print it.
-
-// Need to see if I am in the same parent. 
-// You are in the same parent , the counter is being updated.
