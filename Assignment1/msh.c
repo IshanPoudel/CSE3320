@@ -292,12 +292,19 @@ int main()
     }
 
     // Now print the tokenized input as a debug check
-    // \TODO Remove this code and replace with your shell functionality
+
+    // for (int i=0; i<token_count;i++)
+    // {
+    //   printf("%s\n" , &token[token_count]);
+    // }
+
+    // printf("%s\n" , token[token_count]);    // \TODO Remove this code and replace with your shell functionality
 
     //5. quit function
    
     if ((strcmp(token[0] , "quit") )==0 || (strcmp(token[0] , "exit") )==0)
     {
+      printf("I/m about to quit");
 
       exit(EXIT_SUCCESS);
     }
